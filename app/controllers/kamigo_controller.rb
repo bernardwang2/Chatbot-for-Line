@@ -17,24 +17,6 @@ class KamigoController < ApplicationController
 		#200
 		head :ok
 	end
-
-	#Learning message function
-	def learn(received_text)
-		#if it is not learn, exit
-		return nil unless received_text[0..5] == 'learn;' 
-
-		received_text = received_text[7..-1]
-		semicolon_index = received_text.index(';')
-
-		#if no semicolon, exit
-		return nil if semicolon_index.nil?
-
-		keyword = received_text[0..semicolon_index-1]
-		message = received_text[semicolon_index+1..-1]
-
-		KeywordMapping.create(keyword: keyword, message: message)
-		'Got it!'
-	end
 	
 	#initializing Line Bot
 	def line
@@ -56,6 +38,23 @@ class KamigoController < ApplicationController
 			message['text']
 		end
 		#message['text'] unless message.nil?
+	end
+
+	#Learning message function
+	def learn(received_text)
+		#if it is not learn, exit
+		return nil unless received_text[0..5] == 'learn;' 
+
+		received_text = received_text[6..-1]
+		semicolon_index = received_text.index(';')
+
+		#if no semicolon, exit
+		return nil if semicolon_index.nil?
+
+		keyword = received_text[0..semicolon_index-1]
+		message = received_text[semicolon_index+1..-1]
+
+		KeywordMapping.create(keyword: keyword, message: message)'Got it!'
 	end
 
 	#reply keyword's message
