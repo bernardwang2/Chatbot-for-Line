@@ -55,7 +55,7 @@ class KamigoController < ApplicationController
 		message = received_text[semicolon_index+1..-1]
 
 		KeywordMapping.create(keyword: keyword, message: message)
-		
+		'Got it!'
 	end
 
 	#reply keyword's message
