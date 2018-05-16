@@ -6,10 +6,10 @@ class KamigoController < ApplicationController
 
 	def webhook
 		#Learning message
-		reply_text = learn(received_text)
+		reply_text = learn(channel_id, received_text)
 
 		#Adjusting reply message
-		reply_text = keyword_reply(received_text) if reply_text.nil?
+		reply_text = keyword_reply(channel_id, 0received_text) if reply_text.nil?
 
 		#echo
 		reply_text = echo2(channel_id, received_text) if reply_text.nil?
@@ -48,7 +48,7 @@ class KamigoController < ApplicationController
 	end
 
 	#Learning message function
-	def learn(received_text)
+	def learn(channel_id, received_text)
 		#if it is not learn, exit
 		return nil unless received_text[0..5] == 'learn;' 
 
@@ -61,19 +61,15 @@ class KamigoController < ApplicationController
 		keyword = received_text[0..semicolon_index-1]
 		message = received_text[semicolon_index+1..-1]
 
-		KeywordMapping.create(keyword: keyword, message: message)
+		KeywordMapping.create(channel_id: channel_id, keyword: keyword, message: message)
 		'Got it!'
 	end
 
 	#reply keyword's message
-	def keyword_reply(received_text)
-		mapping = KeywordMapping.where(keyword: received_text).last 
-		if mapping.nil?
-			nil
-		else
-			mapping.message
-		end
-		#KeywordMapping.where(keyword: received_text).last&.message
+	def keyword_reply(channel_id, received_text)
+		message = KeywordMapping.where(channel_id: channel_id, keyword: received_text).last&.message 
+		return message unless message.nil?
+		KeywordMapping.where(keyword: received_text).last&message
 	end
 
 	#reply message
