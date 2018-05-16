@@ -5,16 +5,11 @@ class KamigoController < ApplicationController
 	protect_from_forgery with: :null_session
 
 	def webhook
-		#retrieving reply token
-		reply_token = params['events'][0]['replyToken']
-		#retrieve reply
-		message = {
-			type: 'text',
-			text: '那個 Please'
-		}
+		#Adjusting reply message
+		reply_text = keyword_reply(received_text)
 
 		#Sending message
-		response = line.reply_message(reply_token, message)
+		response = reply_to_line(reply_text)
 		
 		#200
 		head :ok
@@ -29,6 +24,44 @@ class KamigoController < ApplicationController
 			config.channel_secret = '23ae7df34e8bc0cd2e34c2db1b900358'
 			config.channel_token = 'P31wHaPvRDyDJat4VwEfNr8alFp6CSjBiHuaDPgdcG2bO/CZYIwzMjF8L1vCGaLsY9+4zmJomgZdVl1372N9MDx00+8v9cGLsp/fQvsDYGTUfnPrpaoTA4oPyh88s89oJvqZEaNJQc19E/3CL9PKFQdB04t89/1O/w1cDnyilFU='
 		}
+	end
+
+	#retrieving message
+	def received_text
+		params['events'][0]['message']
+		if message.nil?
+			nil
+		else
+			message['text']
+		end
+		#message['text'] unless message.nil?
+	end
+
+	#reply keyword's message
+	def keyword_reply(received_text)
+		keyword_mapping = {
+			'QQ' => '神曲支援: https://www.youtube.com/watch?v=T0LfHEwEXXw&feature=youtu.be&t=1m13s',
+			'我難過' => '神曲支援: https://www.youtube.com/watch?v=T0LfHEwEXXw&feature=youtu.be&t=1m13s'
+		}
+
+		#search for the keyword
+		keyword_mapping[received_text]
+	end
+
+	#reply message
+	def reply_to_line(message)
+		return nil if reply_text.nil?
+		
+		#retrieving reply token
+		reply_token = params['events'][0]['replyToken']
+		#retrieve reply
+		message = {
+			type: 'text',
+			text: reply_text
+		}
+
+		#sending reply
+		line.reply_message(reply_token, message)
 	end
 
 	#testing
