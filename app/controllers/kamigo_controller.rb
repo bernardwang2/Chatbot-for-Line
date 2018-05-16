@@ -5,8 +5,11 @@ class KamigoController < ApplicationController
 	protect_from_forgery with: :null_session
 
 	def webhook
+		#Learning message
+		reply_text = learn(received_text)
+
 		#Adjusting reply message
-		reply_text = keyword_reply(received_text)
+		reply_text = keyword_reply(received_text) if reply_text.nil?
 
 		#Sending message
 		response = reply_to_line(reply_text)
@@ -15,6 +18,24 @@ class KamigoController < ApplicationController
 		head :ok
 	end
 
+	#Learning message function
+	def learn(received_text)
+		#if it is not learn, exit
+		return nil unless received_text[0..5] == 'learn;' 
+
+		received_text = received_text[7..-1]
+		semicolon_index = received_text.index(';')
+
+		#if no semicolon, exit
+		return nil if semicolon_index.nil?
+
+		keyword = received_text[0..semicolon_index-1]
+		message = received_text[semicolon_index+1..-1]
+
+		KeywordMapping.create(keyword: keyword, message: message)
+		'Got it!'
+	end
+	
 	#initializing Line Bot
 	def line
 		#if line is already initialized, return line. Otherwise initializing new one.
@@ -39,13 +60,13 @@ class KamigoController < ApplicationController
 
 	#reply keyword's message
 	def keyword_reply(received_text)
-		keyword_mapping = {
-			'QQ' => '神曲支援: https://www.youtube.com/watch?v=T0LfHEwEXXw&feature=youtu.be&t=1m13s',
-			'我難過' => '神曲支援: https://www.youtube.com/watch?v=T0LfHEwEXXw&feature=youtu.be&t=1m13s'
-		}
-
-		#search for the keyword
-		keyword_mapping[received_text]
+		mapping = KeywordMapping.where(keyword: received_text).last 
+		if mapping.nil?
+			nil
+		else
+			mapping.message
+		end
+		#KeywordMapping.where(keyword: received_text).last&.message
 	end
 
 	#reply message
