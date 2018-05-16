@@ -44,12 +44,12 @@ class KamigoController < ApplicationController
 		reply_token = params['events'][0]['replyToken']
 		#retrieve reply
 		message = {
-			type: 'text'
+			type: 'text',
 			text: '那個 Please'
 		}
 
 		#Sending message
-		response = client.reply_message(reply_token,message)
+		response = client.reply_message(reply_token, message)
 		
 		#200
 		head :ok
