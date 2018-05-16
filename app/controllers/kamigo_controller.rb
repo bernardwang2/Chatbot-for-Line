@@ -11,6 +11,13 @@ class KamigoController < ApplicationController
 		#Adjusting reply message
 		reply_text = keyword_reply(received_text) if reply_text.nil?
 
+		#echo
+		reply_text = echo2(channel_id, received_text) if reply_text.nil?
+
+		#save the conversation
+		save_to_received(channel_id, received_text)
+		save_to_reply(channel_id,reply_text)
+
 		#Sending message
 		response = reply_to_line(reply_text)
 		
@@ -84,6 +91,40 @@ class KamigoController < ApplicationController
 		#sending reply
 		line.reply_message(reply_token, message)
 	end
+
+	#channel_id
+	def channel_id
+		source = params['events'][0]['source']
+		return source['groupId'] || source['roomId'] || source['userId']
+	end
+
+	#save conversation
+	def save_to_received(channel_id, received_text)
+		return if received_text.nil?
+		Received.create(channel_id: channel_id, text: received_text)
+	end
+
+	#save reply
+	def save_to_reply(channel_id, reply_text)
+		return if reply_text.nil?
+		Reply.create(channel_id: channel_id, text: reply_text)
+	end
+
+	#echo
+	def echo2(channel_id, received_text)
+		#if channel_id does not have previous received text, ignore
+		recent_received_texts = Received.where(channel_id: channel_id).last(5)&.pluck(:text)
+		return nil unless received_text.in? recent_received_texts
+
+		#if bot already reply the received_text, ignore
+		last_reply_text = Reply.where(channel_id: channel_id).last&.text
+		return nil if last_reply_text == received_text
+
+		received_text
+	end
+
+
+
 
 	#testing
 	def eat
