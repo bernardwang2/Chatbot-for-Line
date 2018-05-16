@@ -28,7 +28,7 @@ class KamigoController < ApplicationController
 
 	#retrieving message
 	def received_text
-		params['events'][0]['message']
+		message = params['events'][0]['message']
 		if message.nil?
 			nil
 		else
