@@ -1,4 +1,5 @@
 require 'net/http'
+require 'line/bot'
 
 class KamigoController < ApplicationController
 	protect_from_forgery with: :null_session
@@ -33,7 +34,25 @@ class KamigoController < ApplicationController
 	end
 
 	def webhook
-		render plain: params
+		#Line Bot API Initialization
+		client = Line::Bot::Client.new{ |config|
+			config.channel_secret = '23ae7df34e8bc0cd2e34c2db1b900358'
+			config.channel_token = 'P31wHaPvRDyDJat4VwEfNr8alFp6CSjBiHuaDPgdcG2bO/CZYIwzMjF8L1vCGaLsY9+4zmJomgZdVl1372N9MDx00+8v9cGLsp/fQvsDYGTUfnPrpaoTA4oPyh88s89oJvqZEaNJQc19E/3CL9PKFQdB04t89/1O/w1cDnyilFU='
+		}
+
+		#retrieving reply token
+		reply_token = params['events'][0]['replyToken']
+		#retrieve reply
+		message = {
+			type: 'text'
+			text: '那個 Please'
+		}
+
+		#Sending message
+		response = client.reply_message(reply_token,message)
+		
+		#200
+		head :ok
 	end
 
 	def sent_request

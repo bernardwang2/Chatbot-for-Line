@@ -12,6 +12,8 @@ end
 group :production do
 	gem 'pg', '~> 0.21.0'
 end
+# line
+gem 'line-bot-api'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Use SCSS for stylesheets
