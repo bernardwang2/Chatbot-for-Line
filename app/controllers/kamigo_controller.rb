@@ -4,6 +4,34 @@ require 'line/bot'
 class KamigoController < ApplicationController
 	protect_from_forgery with: :null_session
 
+	def webhook
+		#retrieving reply token
+		reply_token = params['events'][0]['replyToken']
+		#retrieve reply
+		message = {
+			type: 'text',
+			text: '那個 Please'
+		}
+
+		#Sending message
+		response = line.reply_message(reply_token, message)
+		
+		#200
+		head :ok
+	end
+
+	#initializing Line Bot
+	def line
+		#if line is already initialized, return line. Otherwise initializing new one.
+		return @line unless @line.nil?
+		#Line Bot API Initialization
+		@line = Line::Bot::Client.new{ |config|
+			config.channel_secret = '23ae7df34e8bc0cd2e34c2db1b900358'
+			config.channel_token = 'P31wHaPvRDyDJat4VwEfNr8alFp6CSjBiHuaDPgdcG2bO/CZYIwzMjF8L1vCGaLsY9+4zmJomgZdVl1372N9MDx00+8v9cGLsp/fQvsDYGTUfnPrpaoTA4oPyh88s89oJvqZEaNJQc19E/3CL9PKFQdB04t89/1O/w1cDnyilFU='
+		}
+	end
+
+	#testing
 	def eat
 		render plain: "good good"
 	end
@@ -31,28 +59,6 @@ class KamigoController < ApplicationController
 		puts "===Before Response.body:#{response.body}==="
 		render plain: "hahahahaha"
 		puts "===After Response.body:#{response.body}==="
-	end
-
-	def webhook
-		#Line Bot API Initialization
-		client = Line::Bot::Client.new{ |config|
-			config.channel_secret = '23ae7df34e8bc0cd2e34c2db1b900358'
-			config.channel_token = 'P31wHaPvRDyDJat4VwEfNr8alFp6CSjBiHuaDPgdcG2bO/CZYIwzMjF8L1vCGaLsY9+4zmJomgZdVl1372N9MDx00+8v9cGLsp/fQvsDYGTUfnPrpaoTA4oPyh88s89oJvqZEaNJQc19E/3CL9PKFQdB04t89/1O/w1cDnyilFU='
-		}
-
-		#retrieving reply token
-		reply_token = params['events'][0]['replyToken']
-		#retrieve reply
-		message = {
-			type: 'text',
-			text: '那個 Please'
-		}
-
-		#Sending message
-		response = client.reply_message(reply_token, message)
-		
-		#200
-		head :ok
 	end
 
 	def sent_request
