@@ -31,8 +31,8 @@ class KamigoController < ApplicationController
 		return @line unless @line.nil?
 		#Line Bot API Initialization
 		@line = Line::Bot::Client.new{ |config|
-			config.channel_secret = '23ae7df34e8bc0cd2e34c2db1b900358'
-			config.channel_token = 'NVnir2GF8C24R9HGypu697ie09w6r/J2st5Yj84COqNgcMemSJv2lcbPInuTGWiyY9+4zmJomgZdVl1372N9MDx00+8v9cGLsp/fQvsDYGQvVpMwOIYNH+d/pVgcF2O12t7g5DIL5Wv8G50/NWe8TgdB04t89/1O/w1cDnyilFU='
+			config.channel_secret = ''
+			config.channel_token = ''
 		}
 	end
 
@@ -166,7 +166,4 @@ class KamigoController < ApplicationController
 		})
 	end
 
-	def translate_to_korean(message)
-		"#{message}油~"
-	end
 end
